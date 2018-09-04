@@ -23,8 +23,8 @@ class IncomingTaskController extends BaseController
         $this->checkWebhookToken();
 
 //Debug code
-//$req_dump = print_r($_REQUEST, true);
-//$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
+$req_dump = print_r($_REQUEST, true);
+$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
 //$req_dump = print_r($_POST, true);
 //$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
 
@@ -68,13 +68,29 @@ class IncomingTaskController extends BaseController
           exit(1);
         }
 
-        if ($_REQUEST[$incomingtask_subject] == "") {
+        //Try to find the first text field provided that has a value
+        $subject_fields = explode(",", preg_replace('/\s+/','', $incomingtask_subject));
+        $found = false;
+        $subject = "";
+        foreach ($subject_fields as $subject_sent) {
+            if ( ($_REQUEST[$subject_sent] != "") && ($found == false) ) {
+                $subject = $_REQUEST[$subject_sent];
+                $found = true;
+            }
+        }
+
+        if ($found == false) {
+            echo "ERROR: You asked to look in the fields named " . implode(",", $subject_fields) . " but none of these were found in the data sent";
+            exit(1);
+        }
+
+        if ($subject == "") {
           echo("ERROR: No text was sent for the task name - ABORT");
           exit(1);
         }
 
         $result = $this->taskCreationModel->create(array(
-                                                         'title' => $_REQUEST[$incomingtask_subject],
+                                                         'title' => $subject,
                                                          'project_id' => $incomingtask_project_id,
                                                          'column_id' => $incomingtask_column_id,
                                                          'swimlane_id' => $incomingtask_swimlane_id,
@@ -82,7 +98,7 @@ class IncomingTaskController extends BaseController
                                                   );
 
         if ($result > 0) {
-           echo("Kanboard accepted a task titled '" . $_REQUEST[$incomingtask_subject]) . "' as task number " . $result;
+           echo("Kanboard accepted a task titled '" . $subject . "' as task number " . $result);
         } else {
            echo("Something went wrong and Kanboard did not accept your task");
         }
