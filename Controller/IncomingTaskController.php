@@ -22,6 +22,12 @@ class IncomingTaskController extends BaseController
         //Requests with an invalid webhook token will be rejected with an "Access denied" message
         $this->checkWebhookToken();
 
+//Debug code
+//$req_dump = print_r($_REQUEST, true);
+//$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
+//$req_dump = print_r($_POST, true);
+//$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
+
         $incomingtask_subject = $this->configModel->get('incomingtask_subject');
         $incomingtask_project_id  = $this->configModel->get('incomingtask_project_id');
         $incomingtask_column_id   = $this->configModel->get('incomingtask_column_id');
@@ -59,6 +65,11 @@ class IncomingTaskController extends BaseController
 
         if (!array_key_exists($incomingtask_swimlane_id, $this->swimlaneModel->getList($incomingtask_project_id))) {
           echo("ERROR: Swimlane " . $incomingtask_swimlane_id . " does not appear to exist in project " . $incomingtask_project_id . " - task insertion will FAIL");
+          exit(1);
+        }
+
+        if ($_REQUEST[$incomingtask_subject] == "") {
+          echo("ERROR: No text was sent for the task name - ABORT");
           exit(1);
         }
 
