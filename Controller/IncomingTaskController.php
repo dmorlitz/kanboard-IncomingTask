@@ -111,7 +111,6 @@ class IncomingTaskController extends BaseController
                                                   );
 
         if ($result > 0) {
-           if ($send_http_error_codes) { http_response_code(500); }
            echo("Kanboard accepted a task titled '" . $subject . "' as task number " . $result);
         } else {
            if ($send_http_error_codes) { http_response_code(500); }
