@@ -102,11 +102,20 @@ class IncomingTaskController extends BaseController
            exit(1);
         }
 
+	$fullrequest = print_r($_REQUEST, true);
+
+        if (isset($_REQUEST['body-plain'])) {
+		$description = $_REQUEST['body-plain'] . "\n\n--------------\n\n" . $fullrequest;
+	} else {
+		$description = $fullrequest;
+	}
+
         $result = $this->taskCreationModel->create(array(
                                                          'title' => $subject,
                                                          'project_id' => $incomingtask_project_id,
                                                          'column_id' => $incomingtask_column_id,
                                                          'swimlane_id' => $incomingtask_swimlane_id,
+							 'description' => $description,
                                                         )
                                                   );
 
