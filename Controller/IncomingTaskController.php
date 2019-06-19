@@ -35,7 +35,7 @@ class IncomingTaskController extends BaseController
 
         // Determine if we need to send HTTP status codes or descriptive text error messages
         $send_http_error_codes = true;
-        if ( (isset($_REQUEST['response_url'])) && (strpos($_REQUEST['response_url'], "slack.com") !== false) ) { $send_http_error_codes = false; }
+        //if ( (isset($_REQUEST['response_url'])) && (strpos($_REQUEST['response_url'], "slack.com") !== false) ) { $send_http_error_codes = false; }
 
         if ($this->configModel->get('incomingtask_subject') == "") {
            if ($send_http_error_codes) { http_response_code(500); }
@@ -120,6 +120,7 @@ class IncomingTaskController extends BaseController
                                                   );
 
         if ($result > 0) {
+           if ($send_http_error_codes) { http_response_code(200); }
            echo("Kanboard accepted a task titled '" . $subject . "' as task number " . $result);
         } else {
            if ($send_http_error_codes) { http_response_code(500); }
