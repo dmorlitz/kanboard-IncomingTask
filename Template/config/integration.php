@@ -32,7 +32,20 @@
 
     <?= $this->form->label(t('URL to provide to remote service:'), 'incomingtask_column_id') ?>
     <div class="panel">
-        <?= $this->text->e($values['incomingtask_host_port'] . $this->url->href('IncomingTaskController', 'receiver', array('plugin' => 'IncomingTask')) . '?token=' . $values['webhook_token'] ) ?>
+        <?php
+            //if (strpos( $this->url->href('IncomingTaskController', 'receiver', array('plugin' => 'IncomingTask')) , "?") !== false)
+            if (strpos( $this->url->href('IncomingTaskController', 'receiver', array('plugin' => 'IncomingTask')) , "?") !== false)
+            {
+               //There is already a ? in the URL - so append token with a &;
+            ?>
+               <?= $this->text->e($values['incomingtask_host_port'] . $this->url->href('IncomingTaskController', 'receiver', array('plugin' => 'IncomingTask')) . '&token=' . $values['webhook_token'] ) ?>
+            <?php
+            } else {
+            ?>
+               <?= $this->text->e($values['incomingtask_host_port'] . $this->url->href('IncomingTaskController', 'receiver', array('plugin' => 'IncomingTask')) . '?token=' . $values['webhook_token'] ) ?>
+            <?php
+            }
+        ?>
     </div>
 
     <?= $this->form->label(t('Debug info:'), 'incomingtask_column_id') ?>
