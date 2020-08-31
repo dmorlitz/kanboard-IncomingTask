@@ -13,7 +13,7 @@ use Kanboard\Controller\BaseController;
 class IncomingTaskController extends BaseController
 {
     /**
-     * Handle IncomingTask webhooks
+     * Handle IncomingTask webhooks - all requests start here
      *
      * @access public
      */
@@ -23,10 +23,10 @@ class IncomingTaskController extends BaseController
         $this->checkWebhookToken();
 
 //Debug code
-//$req_dump = print_r($_REQUEST, true);
-//$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
-//$req_dump = print_r($_POST, true);
-//$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
+$req_dump = print_r($_REQUEST, true);
+$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
+$req_dump = print_r($_POST, true);
+$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
 
         $incomingtask_subject = $this->configModel->get('incomingtask_subject');
         $incomingtask_project_id  = $this->configModel->get('incomingtask_project_id');
