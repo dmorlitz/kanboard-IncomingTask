@@ -23,12 +23,13 @@ class IncomingTaskController extends BaseController
         $this->checkWebhookToken();
 
 //Debug code
-$req_dump = print_r($_REQUEST, true);
-$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
-$req_dump = print_r($_POST, true);
-$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
+//$req_dump = print_r($_REQUEST, true);
+//$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
+//$req_dump = print_r($_POST, true);
+//$fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
 
         $incomingtask_subject = $this->configModel->get('incomingtask_subject');
+        $incomingtask_description = $this->configModel->get('incomingtask_description');
         $incomingtask_project_id  = $this->configModel->get('incomingtask_project_id');
         $incomingtask_column_id   = $this->configModel->get('incomingtask_column_id');
         $incomingtask_swimlane_id = $this->configModel->get('incomingtask_swimlane_id');
@@ -40,6 +41,12 @@ $fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
         if ($this->configModel->get('incomingtask_subject') == "") {
            if ($send_http_error_codes) { http_response_code(500); }
            echo "ERROR: Subject field is not defined - please check your Kanboard configuration";
+           exit(1);
+        }
+
+        if ($this->configModel->get('incomingtask_description') == "") {
+           if ($send_http_error_codes) { http_response_code(500); }
+           echo "ERROR: Description field is not defined - please check your Kanboard configuration";
            exit(1);
         }
 
@@ -102,13 +109,30 @@ $fp = file_put_contents('/tmp/IncomingTask.log', $req_dump, FILE_APPEND);
            exit(1);
         }
 
-	$fullrequest = print_r($_REQUEST, true);
+        //Try to find the first text field provided that has a value
+        $description_fields = explode(",", preg_replace('/\s+/','', $incomingtask_description));
+        $found = false;
+        $description = "";
+        foreach ($description_fields as $description_sent) {
+            if ( ($_REQUEST[$description_sent] != "") && ($found == false) ) {
+                $description = $_REQUEST[$description_sent];
+                $found = true;
+            }
+        }
 
-        if (isset($_REQUEST['body-plain'])) {
-		$description = $_REQUEST['body-plain'] . "\n\n--------------\n\n" . $fullrequest;
-	} else {
-		$description = $fullrequest;
-	}
+        if ($found == false) {
+           if ($send_http_error_codes) { http_response_code(500); }
+           echo "ERROR: You asked to look for a description in the fields named " . implode(",", $description_fields) . " but none of these were found in the data sent";
+           exit(1);
+        }
+
+        if ($description == "") {
+           if ($send_http_error_codes) { http_response_code(500); }
+           echo("ERROR: No text was sent for the task description - ABORT");
+           exit(1);
+        }
+
+	$fullrequest = print_r($_REQUEST, true);
 
         $result = $this->taskCreationModel->create(array(
                                                          'title' => $subject,

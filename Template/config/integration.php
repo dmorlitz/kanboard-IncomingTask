@@ -7,6 +7,9 @@
     <?= $this->form->label(t('Field to use for task subject (must exist in the incoming JSON request)'), 'incomingtask_subject') ?>
     <?= $this->form->text('incomingtask_subject', $values) ?>
 
+    <?= $this->form->label(t('Field to use for task description (must exist in the incoming JSON request)'), 'incomingtask_description') ?>
+    <?= $this->form->text('incomingtask_description', $values) ?>
+
     <p class="alert"><?= t("Warning: You need to click save every time you change a drop-down for the other ones to populate with valid date - sorry I am still working on this.") ?></p>
 
     <?= $this->form->label(t('Project ID for task creation'), 'incomingtask_project_id') ?>
